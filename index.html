@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>a program compiled just for you</title>
-
+ 
 <!--
   ============================================================
   HOW TO CUSTOMIZE THIS FILE — read this before hosting it!
@@ -12,19 +12,19 @@
   Scroll to the "CONFIG" section inside the <script> tag near
   the bottom of this file. Everything you need to change is
   gathered there:
-
+ 
     - HER_NAME          -> what she must type to unlock the gift
     - TARGET_DATE        -> the exact moment the countdown ends
     - PHOTOS              -> your memories (captions + optional img paths)
     - GIFT_CLUE            -> where her real gift is hidden
     - QR_LINK                -> a link to a video / playlist / photo album
-
+ 
   To add real photos: put image files in a folder named "photos"
   next to this index.html, and set each photo's "src" to
   "photos/yourfile.jpg" instead of leaving it blank (blank = a
   pretty gradient placeholder is shown instead, so the page still
   works if you don't have photos ready yet).
-
+ 
   TO HOST IT (free, takes 5 minutes):
     1. Create a new GitHub repo, e.g. "for-her"
     2. Upload this index.html (and your /photos folder if used)
@@ -34,7 +34,7 @@
        want the countdown itself to be the surprise)
   ============================================================
 -->
-
+ 
 <style>
   :root{
     --bg:#0b0f14;
@@ -48,15 +48,15 @@
     --mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
     --serif: 'Fraunces', Georgia, serif;
   }
-
+ 
   @font-face{
     font-family:'JetBrains Mono';
     src:local('JetBrains Mono');
   }
-
+ 
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
-
+ 
   body{
     margin:0;
     background:
@@ -68,16 +68,16 @@
     overflow-x:hidden;
     perspective: 1200px;
   }
-
+ 
   ::selection{ background:var(--rose); color:#0b0f14; }
-
+ 
   a{ color:var(--mint); }
-
+ 
   .noise{
     position:fixed; inset:0; pointer-events:none; opacity:0.03; z-index:1;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-
+ 
   /* ---------- shared section chrome ---------- */
   section{
     position:relative;
@@ -109,7 +109,7 @@
     color:var(--ink);
     letter-spacing:-0.01em;
   }
-
+ 
   /* ================= HERO / TERMINAL BOOT ================= */
   .hero{
     min-height:100svh;
@@ -121,7 +121,7 @@
     padding: 2rem 1.5rem;
     position:relative;
   }
-
+ 
   .term-window{
     width:min(680px, 92vw);
     background: rgba(17,24,35,0.9);
@@ -164,7 +164,7 @@
     animation: blink 1s steps(1) infinite;
   }
   @keyframes blink{ 50%{ opacity:0; } }
-
+ 
   .hero-sub{
     margin-top:2rem;
     color:var(--ink-dim);
@@ -180,7 +180,7 @@
     animation: floaty 2.4s ease-in-out infinite;
   }
   @keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(6px);} }
-
+ 
   /* ================= COUNTDOWN ================= */
   .countdown-grid{
     display:grid;
@@ -250,7 +250,7 @@
     padding:2rem 0;
     display:none;
   }
-
+ 
   /* ================= GALLERY (3D flip cards) ================= */
   .gallery{
     display:grid;
@@ -284,6 +284,7 @@
     position:absolute;
     inset:0;
     transform: rotateY(180deg);
+    backface-visibility:hidden;
     background: linear-gradient(135deg, var(--rose), var(--rose-soft));
     border-radius:4px;
     box-shadow: 0 18px 35px rgba(0,0,0,0.45);
@@ -317,7 +318,7 @@
     font-family:var(--serif);
     font-size:0.85rem;
   }
-
+ 
   /* ================= UNLOCK / GIFT BOX ================= */
   .unlock-wrap{
     text-align:center;
@@ -361,7 +362,7 @@
     color:var(--ink-dim);
     min-height:1.2em;
   }
-
+ 
   .stage{
     margin-top:3rem;
     display:flex;
@@ -411,7 +412,7 @@
   }
   .ribbon-v{ width:22px; height:180px; left:79px; top:0; }
   .ribbon-h{ height:22px; width:180px; top:79px; left:0; }
-
+ 
   .reveal{
     margin-top: 2.6rem;
     max-width:560px;
@@ -439,7 +440,7 @@
   }
   .reveal p + p{ margin-top:0.8rem; }
   .reveal .clue{ color:var(--rose-soft); }
-
+ 
   /* ================= QR SECTION ================= */
   .qr-card{
     display:flex;
@@ -460,7 +461,7 @@
   }
   .qr-text{ flex:1 1 220px; }
   .qr-text p{ color:var(--ink-dim); font-size:0.85rem; line-height:1.7; margin:0.4rem 0 0; }
-
+ 
   footer{
     text-align:center;
     padding: 3rem 1.5rem 4rem;
@@ -469,12 +470,12 @@
     letter-spacing:0.04em;
   }
   footer .heart{ color:var(--rose); }
-
+ 
   @media (max-width:520px){
     .countdown-grid{ gap:0.5rem; }
     .flip{ padding:1rem 0.3rem; }
   }
-
+ 
   /* ================= FLOATING PARTICLES ================= */
   #particleField{
     position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
@@ -494,7 +495,7 @@
     92%{ opacity:0.7; }
     100%{ transform: translateY(-115vh) translateX(var(--drift, 40px)) rotate(20deg); opacity:0; }
   }
-
+ 
   /* ================= SCROLL REVEAL (3D) ================= */
   .reveal-on-scroll{
     opacity:0;
@@ -506,7 +507,7 @@
     opacity:1;
     transform:translateY(0) rotateX(0deg);
   }
-
+ 
   /* ================= GIFT BOX IDLE BREATHING ================= */
   .box.idle{
     animation: breathe 3.2s ease-in-out infinite;
@@ -536,7 +537,7 @@
     0%,100%{ opacity:0.5; transform: translate(-50%,-50%) scale(0.9); }
     50%{ opacity:0.9; transform: translate(-50%,-50%) scale(1.08); }
   }
-
+ 
   /* subtle hover lift on interactive cards */
   .qr-card, .term-window{
     transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -545,7 +546,7 @@
     transform: translateY(-4px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
   }
-
+ 
   /* ================= 3D FLOATING SHAPES ================= */
   #shapeField{
     position:fixed; inset:0; pointer-events:none; z-index:0;
@@ -570,17 +571,17 @@
     0%,100%{ margin-top:0px; }
     50%{ margin-top:-30px; }
   }
-
+ 
   /* hero parallax tilt */
   .term-window{
     transform-style: preserve-3d;
     will-change: transform;
   }
-
+ 
   /* draggable gift box cue */
   .box.idle{ cursor:grab; }
   .box.dragging{ cursor:grabbing; transition:none !important; animation:none !important; }
-
+ 
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
     #particleField{ display:none; }
@@ -589,11 +590,11 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="noise"></div>
 <div id="particleField"></div>
 <div id="shapeField"></div>
-
+ 
 <!-- ================= HERO ================= -->
 <section class="hero">
   <div class="term-window">
@@ -605,7 +606,7 @@
   </div>
   <div class="scroll-hint">↓ scroll to run the rest of the program ↓</div>
 </section>
-
+ 
 <!-- ================= COUNTDOWN ================= -->
 <section id="countdown" class="reveal-on-scroll">
   <div class="eyebrow">// time until launch</div>
@@ -618,14 +619,14 @@
   </div>
   <div class="countdown-done" id="countdownDone">🎉 It's happening right now 🎉</div>
 </section>
-
+ 
 <!-- ================= GALLERY ================= -->
 <section id="gallery" class="reveal-on-scroll">
   <div class="eyebrow">// git log --memories</div>
   <h2 class="title">A few of my favorite commits</h2>
   <div class="gallery" id="galleryGrid"></div>
 </section>
-
+ 
 <!-- ================= UNLOCK ================= -->
 <section id="unlock" class="reveal-on-scroll">
   <div class="eyebrow">// authentication required</div>
@@ -639,7 +640,7 @@
       <button type="submit">unlock()</button>
     </form>
     <div class="unlock-error" id="unlockError"></div>
-
+ 
     <div class="stage">
       <div class="stage-glow"></div>
       <div class="box idle" id="giftBox">
@@ -654,7 +655,7 @@
         </div>
       </div>
     </div>
-
+ 
     <div class="reveal" id="reveal">
       <h3>Happy birthday. 🎂</h3>
       <p id="revealMsg"></p>
@@ -662,7 +663,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ================= QR ================= -->
 <section id="qr" class="reveal-on-scroll">
   <div class="eyebrow">// scan to decrypt</div>
@@ -674,11 +675,11 @@
     </div>
   </div>
 </section>
-
+ 
 <footer>
   built line by line, just like this <span class="heart">♥</span> — for you, every single time
 </footer>
-
+ 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <script>
@@ -704,7 +705,7 @@ const CONFIG = {
   ]
 };
 /* ============================================================ */
-
+ 
 // ---------- Floating particles ----------
 const particleField = document.getElementById('particleField');
 const particleGlyphs = ['♥', '✦', '·', '✧'];
@@ -725,7 +726,7 @@ function spawnParticle(){
 }
 for(let i=0;i<10;i++){ setTimeout(spawnParticle, i*500); }
 setInterval(spawnParticle, 1400);
-
+ 
 // ---------- Scroll reveal ----------
 const revealEls = document.querySelectorAll('.reveal-on-scroll');
 const revealObserver = new IntersectionObserver((entries) => {
@@ -737,7 +738,7 @@ const revealObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.15 });
 revealEls.forEach(el => revealObserver.observe(el));
-
+ 
 // ---------- Terminal boot sequence ----------
 const termBody = document.getElementById('termBody');
 const bootLines = [
@@ -752,7 +753,7 @@ const bootLines = [
   { text: `$ echo "happy birthday"`, cls: 'term-prompt', pause: 300 },
   { text: `> happy birthday, ${CONFIG.HER_NAME}. 💛`, cls: 'term-heart', pause: 0 },
 ];
-
+ 
 function typeLine(line, container, cb){
   const div = document.createElement('div');
   div.className = 'term-line ' + line.cls;
@@ -770,7 +771,7 @@ function typeLine(line, container, cb){
   }
   step();
 }
-
+ 
 function runBoot(lines, container, onDone){
   let idx = 0;
   function next(){
@@ -786,19 +787,19 @@ function runBoot(lines, container, onDone){
   next();
 }
 runBoot(bootLines, termBody);
-
+ 
 // ---------- Countdown (3D flip-clock) ----------
 const target = new Date(CONFIG.TARGET_DATE).getTime();
 const grid = document.getElementById('countdownGrid');
 const done = document.getElementById('countdownDone');
-
+ 
 const flipUnits = {
   days:  { front: document.getElementById('cd-days'),  back: document.getElementById('cd-days-back'),  card: document.getElementById('flip-days'),  last: null },
   hours: { front: document.getElementById('cd-hours'), back: document.getElementById('cd-hours-back'), card: document.getElementById('flip-hours'), last: null },
   mins:  { front: document.getElementById('cd-mins'),  back: document.getElementById('cd-mins-back'),  card: document.getElementById('flip-mins'),  last: null },
   secs:  { front: document.getElementById('cd-secs'),  back: document.getElementById('cd-secs-back'), card: document.getElementById('flip-secs'),  last: null },
 };
-
+ 
 function setDigit(unit, value){
   const u = flipUnits[unit];
   if(u.last === value) return;
@@ -812,7 +813,7 @@ function setDigit(unit, value){
   }, 560);
   u.last = value;
 }
-
+ 
 function tick(){
   const now = Date.now();
   const diff = target - now;
@@ -833,7 +834,7 @@ function tick(){
 }
 tick();
 const timer = setInterval(tick, 1000);
-
+ 
 // ---------- 3D floating background shapes ----------
 const shapeField = document.getElementById('shapeField');
 function makeCubeFace(t){ const f=document.createElement('div'); f.className='f '+t; return f; }
@@ -845,7 +846,7 @@ function spawnShape3d(){
   parallaxWrap.style.left = Math.random()*96 + 'vw';
   parallaxWrap.style.top = Math.random()*90 + 'vh';
   parallaxWrap.style.willChange = 'transform';
-
+ 
   const wrap = document.createElement('div');
   wrap.className = 'shape3d';
   wrap.style.position = 'relative';
@@ -875,7 +876,7 @@ function spawnShape3d(){
   shapeField.appendChild(parallaxWrap);
 }
 for(let i=0;i<9;i++){ spawnShape3d(); }
-
+ 
 // ---------- Cursor sparkle trail ----------
 const trailGlyphs = ['✦', '✧', '·'];
 let lastTrailTime = 0;
@@ -901,7 +902,7 @@ document.addEventListener('mousemove', (e) => {
   });
   setTimeout(() => s.remove(), 720);
 });
-
+ 
 // ---------- Scroll-based parallax depth for 3D shapes ----------
 let lastScrollY = window.scrollY;
 window.addEventListener('scroll', () => {
@@ -914,7 +915,7 @@ window.addEventListener('scroll', () => {
     el.style.transform = `translateY(${current}px)`;
   });
 }, { passive: true });
-
+ 
 // ---------- Hero terminal parallax tilt ----------
 const termWindow = document.querySelector('.term-window');
 const heroSection = document.querySelector('.hero');
@@ -929,7 +930,7 @@ if(termWindow && heroSection){
     termWindow.style.transform = '';
   });
 }
-
+ 
 // ---------- Gallery ----------
 const galleryGrid = document.getElementById('galleryGrid');
 const gradients = [
@@ -945,7 +946,7 @@ CONFIG.PHOTOS.forEach((p, i) => {
   outer.className = 'card-flip';
   const inner = document.createElement('div');
   inner.className = 'card-flip-inner';
-
+ 
   const front = document.createElement('div');
   front.className = 'polaroid';
   const frame = document.createElement('div');
@@ -961,19 +962,19 @@ CONFIG.PHOTOS.forEach((p, i) => {
   cap.textContent = p.caption;
   front.appendChild(frame);
   front.appendChild(cap);
-
+ 
   const back = document.createElement('div');
   back.className = 'polaroid-back';
   const backCap = document.createElement('div');
   backCap.className = 'back-cap';
   backCap.textContent = '♥ ' + p.caption;
   back.appendChild(backCap);
-
+ 
   inner.appendChild(front);
   inner.appendChild(back);
   outer.appendChild(inner);
   galleryGrid.appendChild(outer);
-
+ 
   outer.addEventListener('mousemove', (e) => {
     if(outer.classList.contains('flipped')) return;
     const rect = outer.getBoundingClientRect();
@@ -990,7 +991,7 @@ CONFIG.PHOTOS.forEach((p, i) => {
     inner.style.transform = ''; // let the .flipped CSS rule take over cleanly
   });
 });
-
+ 
 // ---------- Unlock / gift box ----------
 const form = document.getElementById('unlockForm');
 const input = document.getElementById('nameInput');
@@ -1000,7 +1001,7 @@ const reveal = document.getElementById('reveal');
 const revealMsg = document.getElementById('revealMsg');
 const revealClue = document.getElementById('revealClue');
 let unlocked = false;
-
+ 
 // let her spin the box herself before it unlocks
 let isDragging = false, dragStartX = 0, dragStartY = 0, rotY = 28, rotX = -18;
 box.addEventListener('pointerdown', (e) => {
@@ -1028,7 +1029,7 @@ function endDrag(e){
 }
 box.addEventListener('pointerup', endDrag);
 box.addEventListener('pointerleave', (e) => { if(isDragging) endDrag(e); });
-
+ 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   if(unlocked) return;
@@ -1063,7 +1064,7 @@ form.addEventListener('submit', (e) => {
     input.focus();
   }
 });
-
+ 
 // ---------- QR code ----------
 document.getElementById('qrLabel').textContent = CONFIG.QR_LABEL;
 if(window.QRCode){
@@ -1078,3 +1079,4 @@ if(window.QRCode){
 </script>
 </body>
 </html>
+ 
