@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>a program compiled just for you</title>
+
+<!--
+  ============================================================
+  HOW TO CUSTOMIZE THIS FILE — read this before hosting it!
+  ============================================================
+  Scroll to the "CONFIG" section inside the <script> tag near
+  the bottom of this file. Everything you need to change is
+  gathered there:
+
+    - HER_NAME          -> what she must type to unlock the gift
+    - TARGET_DATE        -> the exact moment the countdown ends
+    - PHOTOS              -> your memories (captions + optional img paths)
+    - GIFT_CLUE            -> where her real gift is hidden
+    - QR_LINK                -> a link to a video / playlist / photo album
+
+  To add real photos: put image files in a folder named "photos"
+  next to this index.html, and set each photo's "src" to
+  "photos/yourfile.jpg" instead of leaving it blank (blank = a
+  pretty gradient placeholder is shown instead, so the page still
+  works if you don't have photos ready yet).
+
+  TO HOST IT (free, takes 5 minutes):
+    1. Create a new GitHub repo, e.g. "for-her"
+    2. Upload this index.html (and your /photos folder if used)
+    3. Go to Settings -> Pages -> Deploy from branch -> main -> /root
+    4. GitHub gives you a link like https://yourname.github.io/for-her
+    5. Text her that link at midnight on Aug 15 (or before, if you
+       want the countdown itself to be the surprise)
+  ============================================================
+-->
+
+<style>
+  :root{
+    --bg:#0b0f14;
+    --bg-soft:#111823;
+    --ink:#eef1f5;
+    --ink-dim:#8a94a3;
+    --rose:#ff6f91;
+    --rose-soft:#ffb3c6;
+    --mint:#7cffb2;
+    --amber:#ffd166;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    --serif: 'Fraunces', Georgia, serif;
+  }
+
+  @font-face{
+    font-family:'JetBrains Mono';
+    src:local('JetBrains Mono');
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(255,111,145,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 90% 10%, rgba(124,255,178,0.06), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--mono);
+    overflow-x:hidden;
+    perspective: 1200px;
+  }
+
+  ::selection{ background:var(--rose); color:#0b0f14; }
+
+  a{ color:var(--mint); }
+
+  .noise{
+    position:fixed; inset:0; pointer-events:none; opacity:0.03; z-index:1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- shared section chrome ---------- */
+  section{
+    position:relative;
+    padding: 5rem 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .eyebrow{
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--mint);
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    margin-bottom:1rem;
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px; height:6px; border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 8px var(--mint);
+  }
+  h2.title{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(1.8rem, 4vw, 2.6rem);
+    margin:0 0 2rem 0;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+
+  /* ================= HERO / TERMINAL BOOT ================= */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 2rem 1.5rem;
+    position:relative;
+  }
+
+  .term-window{
+    width:min(680px, 92vw);
+    background: rgba(17,24,35,0.9);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02);
+    backdrop-filter: blur(6px);
+    overflow:hidden;
+    text-align:left;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:0.4rem;
+    padding:0.7rem 0.9rem;
+    background: rgba(255,255,255,0.03);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .term-dot{ width:10px; height:10px; border-radius:50%; }
+  .term-bar .term-dot:nth-child(1){ background:#ff5f57; }
+  .term-bar .term-dot:nth-child(2){ background:#febc2e; }
+  .term-bar .term-dot:nth-child(3){ background:#28c840; }
+  .term-title{
+    margin-left:auto; margin-right:auto;
+    font-size:0.72rem; color:var(--ink-dim);
+    transform: translateX(-14px);
+  }
+  .term-body{
+    padding:1.4rem 1.3rem 1.6rem;
+    font-size:0.86rem;
+    line-height:1.7;
+    min-height:220px;
+  }
+  .term-line{ white-space:pre-wrap; word-break:break-word; }
+  .term-prompt{ color:var(--mint); }
+  .term-out{ color:var(--ink-dim); }
+  .term-ok{ color:var(--mint); }
+  .term-heart{ color:var(--rose); }
+  .cursor{
+    display:inline-block; width:8px; height:1em; background:var(--mint);
+    vertical-align:text-bottom; margin-left:2px;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .hero-sub{
+    margin-top:2rem;
+    color:var(--ink-dim);
+    font-size:0.8rem;
+    letter-spacing:0.02em;
+  }
+  .scroll-hint{
+    margin-top:2.6rem;
+    font-size:0.7rem;
+    color:var(--ink-dim);
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    animation: floaty 2.4s ease-in-out infinite;
+  }
+  @keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(6px);} }
+
+  /* ================= COUNTDOWN ================= */
+  .countdown-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    perspective: 900px;
+  }
+  .flip{
+    background: linear-gradient(180deg, var(--bg-soft), #0d131c);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px;
+    padding: 1.4rem 0.6rem;
+    text-align:center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    transform-style: preserve-3d;
+  }
+  .flip .num-stage{
+    position:relative;
+    height: clamp(2.1rem, 6.5vw, 3.1rem);
+    transform-style: preserve-3d;
+  }
+  .flip .num{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--serif);
+    font-size:clamp(1.8rem, 6vw, 2.8rem);
+    font-weight:600;
+    color:var(--rose-soft);
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+    backface-visibility:hidden;
+    transform-origin:center;
+  }
+  .flip .num-back{
+    color:var(--mint);
+    transform: rotateX(180deg);
+  }
+  .flip.flipping .num-front{
+    animation: flipOutFront 0.55s cubic-bezier(.4,.1,.3,1) forwards;
+  }
+  .flip.flipping .num-back{
+    animation: flipInBack 0.55s cubic-bezier(.4,.1,.3,1) forwards;
+  }
+  @keyframes flipOutFront{
+    0%{ transform: rotateX(0deg); }
+    100%{ transform: rotateX(-180deg); }
+  }
+  @keyframes flipInBack{
+    0%{ transform: rotateX(180deg); }
+    100%{ transform: rotateX(0deg); }
+  }
+  .flip .lbl{
+    margin-top:0.5rem;
+    font-size:0.66rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+  .countdown-done{
+    text-align:center;
+    font-family:var(--serif);
+    font-size:clamp(1.6rem,4vw,2.2rem);
+    color:var(--mint);
+    padding:2rem 0;
+    display:none;
+  }
+
+  /* ================= GALLERY (3D flip cards) ================= */
+  .gallery{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1.6rem;
+    perspective: 1200px;
+    padding-top:0.5rem;
+  }
+  .card-flip{
+    position:relative;
+    cursor:pointer;
+  }
+  .card-flip-inner{
+    position:relative;
+    width:100%;
+    transform-style:preserve-3d;
+    transition: transform 0.15s ease-out; /* overwritten by JS tilt / flip */
+  }
+  .card-flip.flipped .card-flip-inner{
+    transform: rotateY(180deg) !important;
+    transition: transform 0.7s cubic-bezier(.4,.2,.2,1) !important;
+  }
+  .polaroid{
+    background:#f4f1ea;
+    padding: 10px 10px 34px;
+    border-radius:4px;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.45);
+    backface-visibility:hidden;
+  }
+  .polaroid-back{
+    position:absolute;
+    inset:0;
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, var(--rose), var(--rose-soft));
+    border-radius:4px;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 1.2rem;
+  }
+  .polaroid-back .back-cap{
+    font-family:var(--serif);
+    font-size:1rem;
+    color:#0b0f14;
+    font-weight:600;
+    line-height:1.4;
+  }
+  .polaroid .frame{
+    width:100%;
+    aspect-ratio: 1/1;
+    border-radius:2px;
+    background-size:cover;
+    background-position:center;
+    display:flex; align-items:center; justify-content:center;
+    color:rgba(0,0,0,0.35);
+    font-size:0.7rem;
+  }
+  .polaroid .cap{
+    margin-top:10px;
+    text-align:center;
+    color:#33302a;
+    font-family:var(--serif);
+    font-size:0.85rem;
+  }
+
+  /* ================= UNLOCK / GIFT BOX ================= */
+  .unlock-wrap{
+    text-align:center;
+  }
+  .unlock-form{
+    display:flex;
+    gap:0.6rem;
+    max-width:420px;
+    margin: 1.6rem auto 0;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .unlock-form input{
+    flex:1 1 220px;
+    background: var(--bg-soft);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:8px;
+    padding:0.75rem 1rem;
+    color:var(--ink);
+    font-family:var(--mono);
+    font-size:0.9rem;
+    outline:none;
+  }
+  .unlock-form input:focus{ border-color:var(--mint); }
+  .unlock-form button{
+    background:var(--rose);
+    color:#0b0f14;
+    border:none;
+    border-radius:8px;
+    padding:0.75rem 1.3rem;
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:0.85rem;
+    cursor:pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .unlock-form button:hover{ transform:translateY(-2px); background:var(--rose-soft); }
+  .unlock-error{
+    margin-top:0.8rem;
+    font-size:0.78rem;
+    color:var(--ink-dim);
+    min-height:1.2em;
+  }
+
+  .stage{
+    margin-top:3rem;
+    display:flex;
+    justify-content:center;
+    perspective: 1400px;
+  }
+  .box{
+    position:relative;
+    width:180px; height:180px;
+    transform-style:preserve-3d;
+    transform: rotateX(-18deg) rotateY(28deg);
+    transition: transform 0.6s ease;
+  }
+  .box.opening{ animation: wobble 0.7s ease; }
+  @keyframes wobble{
+    0%,100%{ transform: rotateX(-18deg) rotateY(28deg); }
+    30%{ transform: rotateX(-18deg) rotateY(28deg) rotateZ(-3deg); }
+    60%{ transform: rotateX(-18deg) rotateY(28deg) rotateZ(3deg); }
+  }
+  .face{
+    position:absolute;
+    width:180px; height:180px;
+    background: linear-gradient(135deg, var(--rose), #ff9fb8);
+    border:1px solid rgba(255,255,255,0.25);
+  }
+  .face.front{ transform: translateZ(90px); }
+  .face.back{ transform: rotateY(180deg) translateZ(90px); }
+  .face.right{ transform: rotateY(90deg) translateZ(90px); background:linear-gradient(135deg,#ff5f82,var(--rose)); }
+  .face.left{ transform: rotateY(-90deg) translateZ(90px); background:linear-gradient(135deg,#ff5f82,var(--rose)); }
+  .face.bottom{ transform: rotateX(-90deg) translateZ(90px); background:#e14f72; }
+  .lid{
+    position:absolute;
+    width:200px; height:200px;
+    top:-10px; left:-10px;
+    background: linear-gradient(135deg, var(--amber), #ffe1a3);
+    border:1px solid rgba(255,255,255,0.3);
+    transform-style:preserve-3d;
+    transform: translateZ(90px);
+    transition: transform 0.9s cubic-bezier(.2,.9,.2,1.2);
+    transform-origin: top;
+  }
+  .box.open .lid{
+    transform: translateZ(90px) rotateX(-130deg) translateY(-20px);
+  }
+  .ribbon-v, .ribbon-h{
+    position:absolute; background:var(--mint); opacity:0.9;
+  }
+  .ribbon-v{ width:22px; height:180px; left:79px; top:0; }
+  .ribbon-h{ height:22px; width:180px; top:79px; left:0; }
+
+  .reveal{
+    margin-top: 2.6rem;
+    max-width:560px;
+    margin-left:auto; margin-right:auto;
+    background: rgba(17,24,35,0.85);
+    border:1px solid rgba(124,255,178,0.25);
+    border-radius:14px;
+    padding: 1.8rem;
+    opacity:0;
+    transform: translateY(14px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.show{ opacity:1; transform:translateY(0); }
+  .reveal h3{
+    margin:0 0 0.6rem;
+    font-family:var(--serif);
+    color:var(--mint);
+    font-size:1.2rem;
+  }
+  .reveal p{
+    margin:0;
+    color:var(--ink-dim);
+    font-size:0.88rem;
+    line-height:1.7;
+  }
+  .reveal p + p{ margin-top:0.8rem; }
+  .reveal .clue{ color:var(--rose-soft); }
+
+  /* ================= QR SECTION ================= */
+  .qr-card{
+    display:flex;
+    gap:1.8rem;
+    align-items:center;
+    flex-wrap:wrap;
+    background: var(--bg-soft);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px;
+    padding: 1.8rem;
+  }
+  #qrcode{
+    background:#fff;
+    padding:10px;
+    border-radius:8px;
+    flex:0 0 auto;
+    line-height:0;
+  }
+  .qr-text{ flex:1 1 220px; }
+  .qr-text p{ color:var(--ink-dim); font-size:0.85rem; line-height:1.7; margin:0.4rem 0 0; }
+
+  footer{
+    text-align:center;
+    padding: 3rem 1.5rem 4rem;
+    color:var(--ink-dim);
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+  }
+  footer .heart{ color:var(--rose); }
+
+  @media (max-width:520px){
+    .countdown-grid{ gap:0.5rem; }
+    .flip{ padding:1rem 0.3rem; }
+  }
+
+  /* ================= FLOATING PARTICLES ================= */
+  #particleField{
+    position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+  }
+  .particle{
+    position:absolute;
+    bottom:-40px;
+    opacity:0;
+    animation-name: floatUp;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes floatUp{
+    0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    8%{ opacity:0.85; }
+    92%{ opacity:0.7; }
+    100%{ transform: translateY(-115vh) translateX(var(--drift, 40px)) rotate(20deg); opacity:0; }
+  }
+
+  /* ================= SCROLL REVEAL (3D) ================= */
+  .reveal-on-scroll{
+    opacity:0;
+    transform: translateY(40px) rotateX(-12deg);
+    transform-origin: center bottom;
+    transition: opacity 0.9s cubic-bezier(.2,.7,.2,1), transform 0.9s cubic-bezier(.2,.7,.2,1);
+  }
+  .reveal-on-scroll.in-view{
+    opacity:1;
+    transform:translateY(0) rotateX(0deg);
+  }
+
+  /* ================= GIFT BOX IDLE BREATHING ================= */
+  .box.idle{
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{ transform: rotateX(-18deg) rotateY(28deg) translateY(0) scale(1); }
+    50%{ transform: rotateX(-16deg) rotateY(32deg) translateY(-8px) scale(1.02); }
+  }
+  .box.idle .lid{
+    animation: lidJiggle 3.2s ease-in-out infinite;
+  }
+  @keyframes lidJiggle{
+    0%,100%{ transform: translateZ(90px) rotateZ(0deg); }
+    50%{ transform: translateZ(90px) rotateZ(-2deg); }
+  }
+  .stage-glow{
+    position:absolute;
+    width:260px; height:260px;
+    left:50%; top:50%;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(255,111,145,0.18), transparent 70%);
+    filter: blur(10px);
+    animation: glowPulse 3.2s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes glowPulse{
+    0%,100%{ opacity:0.5; transform: translate(-50%,-50%) scale(0.9); }
+    50%{ opacity:0.9; transform: translate(-50%,-50%) scale(1.08); }
+  }
+
+  /* subtle hover lift on interactive cards */
+  .qr-card, .term-window{
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .qr-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+
+  /* ================= 3D FLOATING SHAPES ================= */
+  #shapeField{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    perspective: 1000px;
+  }
+  .shape3d{
+    position:absolute;
+    transform-style:preserve-3d;
+    opacity:0.5;
+    animation: spin3d linear infinite, drift3d ease-in-out infinite;
+  }
+  .shape3d .f{
+    position:absolute; inset:0;
+    border:1px solid rgba(255,255,255,0.14);
+    background: rgba(255,111,145,0.05);
+  }
+  @keyframes spin3d{
+    from{ transform: rotateX(0deg) rotateY(0deg); }
+    to{ transform: rotateX(360deg) rotateY(360deg); }
+  }
+  @keyframes drift3d{
+    0%,100%{ margin-top:0px; }
+    50%{ margin-top:-30px; }
+  }
+
+  /* hero parallax tilt */
+  .term-window{
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* draggable gift box cue */
+  .box.idle{ cursor:grab; }
+  .box.dragging{ cursor:grabbing; transition:none !important; animation:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+    #particleField{ display:none; }
+    #shapeField{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div id="particleField"></div>
+<div id="shapeField"></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="term-window">
+    <div class="term-bar">
+      <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+      <span class="term-title">surprise.exe</span>
+    </div>
+    <div class="term-body" id="termBody"></div>
+  </div>
+  <div class="scroll-hint">↓ scroll to run the rest of the program ↓</div>
+</section>
+
+<!-- ================= COUNTDOWN ================= -->
+<section id="countdown" class="reveal-on-scroll">
+  <div class="eyebrow">// time until launch</div>
+  <h2 class="title">Counting down to Aug 15</h2>
+  <div class="countdown-grid" id="countdownGrid">
+    <div class="flip" id="flip-days"><div class="num-stage"><div class="num num-front" id="cd-days">--</div><div class="num num-back" id="cd-days-back">--</div></div><div class="lbl">days</div></div>
+    <div class="flip" id="flip-hours"><div class="num-stage"><div class="num num-front" id="cd-hours">--</div><div class="num num-back" id="cd-hours-back">--</div></div><div class="lbl">hours</div></div>
+    <div class="flip" id="flip-mins"><div class="num-stage"><div class="num num-front" id="cd-mins">--</div><div class="num num-back" id="cd-mins-back">--</div></div><div class="lbl">minutes</div></div>
+    <div class="flip" id="flip-secs"><div class="num-stage"><div class="num num-front" id="cd-secs">--</div><div class="num num-back" id="cd-secs-back">--</div></div><div class="lbl">seconds</div></div>
+  </div>
+  <div class="countdown-done" id="countdownDone">🎉 It's happening right now 🎉</div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section id="gallery" class="reveal-on-scroll">
+  <div class="eyebrow">// git log --memories</div>
+  <h2 class="title">A few of my favorite commits</h2>
+  <div class="gallery" id="galleryGrid"></div>
+</section>
+
+<!-- ================= UNLOCK ================= -->
+<section id="unlock" class="reveal-on-scroll">
+  <div class="eyebrow">// authentication required</div>
+  <h2 class="title">One more thing needs your name to compile</h2>
+  <div class="unlock-wrap">
+    <p style="color:var(--ink-dim); font-size:0.85rem; max-width:480px; margin:0 auto;">
+      Type your name below. This program only runs for one person on Earth.
+    </p>
+    <form class="unlock-form" id="unlockForm" autocomplete="off">
+      <input type="text" id="nameInput" placeholder="type your name..." />
+      <button type="submit">unlock()</button>
+    </form>
+    <div class="unlock-error" id="unlockError"></div>
+
+    <div class="stage">
+      <div class="stage-glow"></div>
+      <div class="box idle" id="giftBox">
+        <div class="face front"></div>
+        <div class="face back"></div>
+        <div class="face right"></div>
+        <div class="face left"></div>
+        <div class="face bottom"></div>
+        <div class="lid">
+          <div class="ribbon-v"></div>
+          <div class="ribbon-h"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" id="reveal">
+      <h3>Happy birthday. 🎂</h3>
+      <p id="revealMsg"></p>
+      <p class="clue" id="revealClue"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QR ================= -->
+<section id="qr" class="reveal-on-scroll">
+  <div class="eyebrow">// scan to decrypt</div>
+  <h2 class="title">One last payload for you</h2>
+  <div class="qr-card">
+    <div id="qrcode"></div>
+    <div class="qr-text">
+      <p id="qrLabel">Scan this with your phone camera — it's for you.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  built line by line, just like this <span class="heart">♥</span> — for you, every single time
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
+<script>
+/* ============================================================
+   CONFIG — edit everything in this block, nothing else needed
+   ============================================================ */
+const CONFIG = {
+  HER_NAME: "shafeeka",           // lowercase, what she must type (case-insensitive match) — first name only, easier to type on the unlock screen
+  TARGET_DATE: "2026-08-15T00:00:00", // countdown target — her local midnight on her birthday
+  GIFT_CLUE: "", // left empty on purpose — leave blank if you're handing the real gift to her in person instead of hiding it
+  UNLOCK_MESSAGE: "Happy 18th birthday, Shafeeka. Every year with you feels like its own gift, and I can't wait to celebrate this one with you in person.",
+  QR_LINK: "https://open.spotify.com/track/6DFdJRSeqjWjXiIMxPhxkh?si=1w0Hu6MhT26mbLcuaXMtHQ&utm_source=copy-link", // your song
+  QR_LABEL: "Scan to play our song.",
+  PHOTOS: [
+    { caption: "our first outing", src: "photos/outing.jpeg" },
+    { caption: "our first story", src: "photos/story.jpeg" },
+    { caption: "the baby I want", src: "photos/baby.jpeg" },
+    { caption: "our first kiss", src: "photos/kiss.jpeg" },
+    { caption: "falling asleep together", src: "photos/sleep.jpeg" },
+    { caption: "my favorite picture of you", src: "photos/fav.jpeg" }
+    // add more objects like the ones above for extra photos —
+    // the gallery grid grows automatically, no other changes needed
+  ]
+};
+/* ============================================================ */
+
+// ---------- Floating particles ----------
+const particleField = document.getElementById('particleField');
+const particleGlyphs = ['♥', '✦', '·', '✧'];
+const particleColors = ['#ff6f91', '#7cffb2', '#ffd166', '#ffb3c6'];
+function spawnParticle(){
+  const el = document.createElement('span');
+  el.className = 'particle';
+  el.textContent = particleGlyphs[Math.floor(Math.random()*particleGlyphs.length)];
+  const size = 10 + Math.random()*16;
+  el.style.fontSize = size + 'px';
+  el.style.left = Math.random()*100 + 'vw';
+  el.style.color = particleColors[Math.floor(Math.random()*particleColors.length)];
+  el.style.setProperty('--drift', (Math.random()*80 - 40) + 'px');
+  const duration = 9 + Math.random()*10;
+  el.style.animationDuration = duration + 's';
+  particleField.appendChild(el);
+  setTimeout(() => el.remove(), duration*1000 + 200);
+}
+for(let i=0;i<10;i++){ setTimeout(spawnParticle, i*500); }
+setInterval(spawnParticle, 1400);
+
+// ---------- Scroll reveal ----------
+const revealEls = document.querySelectorAll('.reveal-on-scroll');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+revealEls.forEach(el => revealObserver.observe(el));
+
+// ---------- Terminal boot sequence ----------
+const termBody = document.getElementById('termBody');
+const bootLines = [
+  { text: `$ whoami`, cls: 'term-prompt', pause: 300 },
+  { text: `> your favorite developer`, cls: 'term-out', pause: 500 },
+  { text: `$ ./compile_surprise.sh --for="${CONFIG.HER_NAME}"`, cls: 'term-prompt', pause: 400 },
+  { text: `> loading memories...        [OK]`, cls: 'term-ok', pause: 350 },
+  { text: `> loading inside jokes...    [OK]`, cls: 'term-ok', pause: 350 },
+  { text: `> loading how much I love you...`, cls: 'term-out', pause: 400 },
+  { text: `> ERROR: value too large to compute`, cls: 'term-heart', pause: 500 },
+  { text: `> ...compiling anyway`, cls: 'term-out', pause: 600 },
+  { text: `$ echo "happy birthday"`, cls: 'term-prompt', pause: 300 },
+  { text: `> happy birthday, ${CONFIG.HER_NAME}. 💛`, cls: 'term-heart', pause: 0 },
+];
+
+function typeLine(line, container, cb){
+  const div = document.createElement('div');
+  div.className = 'term-line ' + line.cls;
+  container.appendChild(div);
+  let i = 0;
+  const speed = 18;
+  function step(){
+    if(i <= line.text.length){
+      div.textContent = line.text.slice(0, i);
+      i++;
+      setTimeout(step, speed);
+    } else {
+      setTimeout(cb, line.pause);
+    }
+  }
+  step();
+}
+
+function runBoot(lines, container, onDone){
+  let idx = 0;
+  function next(){
+    if(idx >= lines.length){
+      const cur = document.createElement('span');
+      cur.className = 'cursor';
+      container.appendChild(cur);
+      if(onDone) onDone();
+      return;
+    }
+    typeLine(lines[idx], container, () => { idx++; next(); });
+  }
+  next();
+}
+runBoot(bootLines, termBody);
+
+// ---------- Countdown (3D flip-clock) ----------
+const target = new Date(CONFIG.TARGET_DATE).getTime();
+const grid = document.getElementById('countdownGrid');
+const done = document.getElementById('countdownDone');
+
+const flipUnits = {
+  days:  { front: document.getElementById('cd-days'),  back: document.getElementById('cd-days-back'),  card: document.getElementById('flip-days'),  last: null },
+  hours: { front: document.getElementById('cd-hours'), back: document.getElementById('cd-hours-back'), card: document.getElementById('flip-hours'), last: null },
+  mins:  { front: document.getElementById('cd-mins'),  back: document.getElementById('cd-mins-back'),  card: document.getElementById('flip-mins'),  last: null },
+  secs:  { front: document.getElementById('cd-secs'),  back: document.getElementById('cd-secs-back'), card: document.getElementById('flip-secs'),  last: null },
+};
+
+function setDigit(unit, value){
+  const u = flipUnits[unit];
+  if(u.last === value) return;
+  u.back.textContent = value;
+  u.card.classList.remove('flipping');
+  void u.card.offsetWidth; // restart animation
+  u.card.classList.add('flipping');
+  setTimeout(() => {
+    u.front.textContent = value;
+    u.card.classList.remove('flipping');
+  }, 560);
+  u.last = value;
+}
+
+function tick(){
+  const now = Date.now();
+  const diff = target - now;
+  if(diff <= 0){
+    grid.style.display = 'none';
+    done.style.display = 'block';
+    clearInterval(timer);
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  setDigit('days', String(d).padStart(2,'0'));
+  setDigit('hours', String(h).padStart(2,'0'));
+  setDigit('mins', String(m).padStart(2,'0'));
+  setDigit('secs', String(s).padStart(2,'0'));
+}
+tick();
+const timer = setInterval(tick, 1000);
+
+// ---------- 3D floating background shapes ----------
+const shapeField = document.getElementById('shapeField');
+function makeCubeFace(t){ const f=document.createElement('div'); f.className='f '+t; return f; }
+function spawnShape3d(){
+  const parallaxWrap = document.createElement('div');
+  parallaxWrap.className = 'shape-parallax';
+  parallaxWrap.style.position = 'absolute';
+  const size = 22 + Math.random()*34;
+  parallaxWrap.style.left = Math.random()*96 + 'vw';
+  parallaxWrap.style.top = Math.random()*90 + 'vh';
+  parallaxWrap.style.willChange = 'transform';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'shape3d';
+  wrap.style.position = 'relative';
+  wrap.style.left = '0'; wrap.style.top = '0';
+  wrap.style.width = size+'px';
+  wrap.style.height = size+'px';
+  const dur = 14 + Math.random()*16;
+  wrap.style.animationDuration = dur+'s, ' + (5+Math.random()*4) + 's';
+  wrap.style.animationDelay = (-Math.random()*dur) + 's, ' + (-Math.random()*4) + 's';
+  const depth = size/2;
+  ['front','back'].forEach(t => {
+    const f = makeCubeFace(t);
+    f.style.transform = t==='front' ? `translateZ(${depth}px)` : `rotateY(180deg) translateZ(${depth}px)`;
+    wrap.appendChild(f);
+  });
+  ['left','right'].forEach(t => {
+    const f = makeCubeFace(t);
+    f.style.transform = t==='left' ? `rotateY(-90deg) translateZ(${depth}px)` : `rotateY(90deg) translateZ(${depth}px)`;
+    wrap.appendChild(f);
+  });
+  ['top','bottom'].forEach(t => {
+    const f = makeCubeFace(t);
+    f.style.transform = t==='top' ? `rotateX(90deg) translateZ(${depth}px)` : `rotateX(-90deg) translateZ(${depth}px)`;
+    wrap.appendChild(f);
+  });
+  parallaxWrap.appendChild(wrap);
+  shapeField.appendChild(parallaxWrap);
+}
+for(let i=0;i<9;i++){ spawnShape3d(); }
+
+// ---------- Cursor sparkle trail ----------
+const trailGlyphs = ['✦', '✧', '·'];
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if(now - lastTrailTime < 45) return; // throttle
+  lastTrailTime = now;
+  const s = document.createElement('span');
+  s.textContent = trailGlyphs[Math.floor(Math.random()*trailGlyphs.length)];
+  s.style.position = 'fixed';
+  s.style.left = e.clientX + 'px';
+  s.style.top = e.clientY + 'px';
+  s.style.color = Math.random() > 0.5 ? 'var(--rose-soft)' : 'var(--mint)';
+  s.style.fontSize = (8 + Math.random()*8) + 'px';
+  s.style.pointerEvents = 'none';
+  s.style.zIndex = '9999';
+  s.style.transform = 'translate(-50%,-50%)';
+  s.style.transition = 'transform 0.7s ease-out, opacity 0.7s ease-out';
+  document.body.appendChild(s);
+  requestAnimationFrame(() => {
+    s.style.transform = `translate(-50%,-50%) translateY(-18px) scale(0.4)`;
+    s.style.opacity = '0';
+  });
+  setTimeout(() => s.remove(), 720);
+});
+
+// ---------- Scroll-based parallax depth for 3D shapes ----------
+let lastScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+  const delta = window.scrollY - lastScrollY;
+  lastScrollY = window.scrollY;
+  document.querySelectorAll('.shape-parallax').forEach((el, idx) => {
+    const speed = 0.15 + (idx % 4) * 0.08;
+    const current = parseFloat(el.dataset.parY || '0') - delta*speed;
+    el.dataset.parY = current;
+    el.style.transform = `translateY(${current}px)`;
+  });
+}, { passive: true });
+
+// ---------- Hero terminal parallax tilt ----------
+const termWindow = document.querySelector('.term-window');
+const heroSection = document.querySelector('.hero');
+if(termWindow && heroSection){
+  heroSection.addEventListener('mousemove', (e) => {
+    const rect = heroSection.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    termWindow.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg) translateZ(0)`;
+  });
+  heroSection.addEventListener('mouseleave', () => {
+    termWindow.style.transform = '';
+  });
+}
+
+// ---------- Gallery ----------
+const galleryGrid = document.getElementById('galleryGrid');
+const gradients = [
+  'linear-gradient(135deg,#ff9a9e,#fecfef)',
+  'linear-gradient(135deg,#a1c4fd,#c2e9fb)',
+  'linear-gradient(135deg,#ffecd2,#fcb69f)',
+  'linear-gradient(135deg,#84fab0,#8fd3f4)',
+  'linear-gradient(135deg,#fbc2eb,#a6c1ee)',
+  'linear-gradient(135deg,#fddb92,#d1fdff)'
+];
+CONFIG.PHOTOS.forEach((p, i) => {
+  const outer = document.createElement('div');
+  outer.className = 'card-flip';
+  const inner = document.createElement('div');
+  inner.className = 'card-flip-inner';
+
+  const front = document.createElement('div');
+  front.className = 'polaroid';
+  const frame = document.createElement('div');
+  frame.className = 'frame';
+  if(p.src){
+    frame.style.backgroundImage = `url("${p.src}")`;
+  } else {
+    frame.style.background = gradients[i % gradients.length];
+    frame.textContent = 'add photo';
+  }
+  const cap = document.createElement('div');
+  cap.className = 'cap';
+  cap.textContent = p.caption;
+  front.appendChild(frame);
+  front.appendChild(cap);
+
+  const back = document.createElement('div');
+  back.className = 'polaroid-back';
+  const backCap = document.createElement('div');
+  backCap.className = 'back-cap';
+  backCap.textContent = '♥ ' + p.caption;
+  back.appendChild(backCap);
+
+  inner.appendChild(front);
+  inner.appendChild(back);
+  outer.appendChild(inner);
+  galleryGrid.appendChild(outer);
+
+  outer.addEventListener('mousemove', (e) => {
+    if(outer.classList.contains('flipped')) return;
+    const rect = outer.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    inner.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) translateY(-4px)`;
+  });
+  outer.addEventListener('mouseleave', () => {
+    if(outer.classList.contains('flipped')) return;
+    inner.style.transform = '';
+  });
+  outer.addEventListener('click', () => {
+    outer.classList.toggle('flipped');
+    inner.style.transform = ''; // let the .flipped CSS rule take over cleanly
+  });
+});
+
+// ---------- Unlock / gift box ----------
+const form = document.getElementById('unlockForm');
+const input = document.getElementById('nameInput');
+const errEl = document.getElementById('unlockError');
+const box = document.getElementById('giftBox');
+const reveal = document.getElementById('reveal');
+const revealMsg = document.getElementById('revealMsg');
+const revealClue = document.getElementById('revealClue');
+let unlocked = false;
+
+// let her spin the box herself before it unlocks
+let isDragging = false, dragStartX = 0, dragStartY = 0, rotY = 28, rotX = -18;
+box.addEventListener('pointerdown', (e) => {
+  if(unlocked) return;
+  isDragging = true;
+  box.classList.add('dragging');
+  box.classList.remove('idle');
+  dragStartX = e.clientX; dragStartY = e.clientY;
+  box.setPointerCapture(e.pointerId);
+});
+box.addEventListener('pointermove', (e) => {
+  if(!isDragging) return;
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+  box.style.transform = `rotateY(${rotY + dx*0.5}deg) rotateX(${rotX - dy*0.5}deg)`;
+});
+function endDrag(e){
+  if(!isDragging) return;
+  isDragging = false;
+  box.classList.remove('dragging');
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+  rotY += dx*0.5; rotX -= dy*0.5;
+  if(!unlocked) box.classList.add('idle'); // resume gentle idle motion
+}
+box.addEventListener('pointerup', endDrag);
+box.addEventListener('pointerleave', (e) => { if(isDragging) endDrag(e); });
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if(unlocked) return;
+  const val = input.value.trim().toLowerCase();
+  if(val === CONFIG.HER_NAME.toLowerCase()){
+    unlocked = true;
+    errEl.textContent = '';
+    box.classList.remove('idle');
+    box.classList.add('opening');
+    setTimeout(() => box.classList.add('open'), 300);
+    setTimeout(() => {
+      revealMsg.textContent = CONFIG.UNLOCK_MESSAGE;
+      if(CONFIG.GIFT_CLUE && CONFIG.GIFT_CLUE.trim()){
+        revealClue.textContent = '🔍 ' + CONFIG.GIFT_CLUE;
+        revealClue.style.display = '';
+      } else {
+        revealClue.style.display = 'none';
+      }
+      reveal.classList.add('show');
+    }, 1000);
+    if(window.confetti){
+      const duration = 2000;
+      const end = Date.now() + duration;
+      (function frame(){
+        confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#ff6f91','#7cffb2','#ffd166'] });
+        confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#ff6f91','#7cffb2','#ffd166'] });
+        if(Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+  } else {
+    errEl.textContent = "hmm, that's not quite the right value — try again";
+    input.focus();
+  }
+});
+
+// ---------- QR code ----------
+document.getElementById('qrLabel').textContent = CONFIG.QR_LABEL;
+if(window.QRCode){
+  new QRCode(document.getElementById('qrcode'), {
+    text: CONFIG.QR_LINK,
+    width: 140,
+    height: 140,
+    colorDark: '#0b0f14',
+    colorLight: '#ffffff'
+  });
+}
+</script>
+</body>
+</html>
