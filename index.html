@@ -545,9 +545,10 @@
     z-index:0;
     background: conic-gradient(from 0deg at 50% 50%,
       rgba(255,111,145,0.12), rgba(201,167,255,0.12), rgba(255,209,102,0.09), rgba(255,111,145,0.12));
-    filter: blur(90px);
+    filter: blur(60px);
     animation: washSpin 34s linear infinite;
     mix-blend-mode: screen;
+    will-change: transform;
   }
   @keyframes washSpin{
     from{ transform: rotate(0deg); }
@@ -748,6 +749,9 @@
   }
   #birthdayVideo{
     width:100%;
+    aspect-ratio: 9/16;
+    max-height:70vh;
+    object-fit:cover;
     border-radius:10px;
     background:#000;
     display:block;
@@ -793,6 +797,15 @@
   }
 
   body.gate-active{ overflow:hidden; height:100vh; }
+
+  /* lighten the heaviest visual effects on phones to prevent lag */
+  @media (max-width:640px){
+    #colorWash{ display:none; }
+    #shapeField{ display:none; }
+    body{ perspective:none; }
+    .reveal-on-scroll{ transform: translateY(24px); } /* drop the rotateX for a cheaper, smoother reveal */
+    .reveal-on-scroll.in-view{ transform: translateY(0); }
+  }
 
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
@@ -1031,6 +1044,7 @@ gateForm.addEventListener('submit', (e) => {
 
 
 // ---------- Floating particles ----------
+const isSmallScreen = window.matchMedia('(max-width:640px)').matches;
 const particleField = document.getElementById('particleField');
 const particleGlyphs = ['♥', '✦', '·', '✧'];
 const particleColors = ['#ff6f91', '#c9a7ff', '#ffd166', '#ffb3c6'];
@@ -1049,7 +1063,7 @@ function spawnParticle(){
   setTimeout(() => el.remove(), duration*1000 + 200);
 }
 for(let i=0;i<10;i++){ setTimeout(spawnParticle, i*500); }
-setInterval(spawnParticle, 1400);
+setInterval(spawnParticle, isSmallScreen ? 2600 : 1400);
 
 // ---------- Rose petals ----------
 function spawnPetal(){
@@ -1067,7 +1081,7 @@ function spawnPetal(){
   setTimeout(() => el.remove(), duration*1000 + 200);
 }
 for(let i=0;i<6;i++){ setTimeout(spawnPetal, i*900); }
-setInterval(spawnPetal, 2200);
+setInterval(spawnPetal, isSmallScreen ? 4000 : 2200);
 
 // ---------- Party extras: balloons, teddy bear, crown ----------
 const festiveGlyphs = ['🎈', '🧸', '👑', '🌸', '🎀'];
@@ -1085,7 +1099,7 @@ function spawnFestive(){
   setTimeout(() => el.remove(), duration*1000 + 200);
 }
 for(let i=0;i<4;i++){ setTimeout(spawnFestive, i*1600); }
-setInterval(spawnFestive, 4200);
+setInterval(spawnFestive, isSmallScreen ? 7000 : 4200);
 
 // ---------- Scroll reveal ----------
 const revealEls = document.querySelectorAll('.reveal-on-scroll');
@@ -1239,7 +1253,9 @@ function spawnShape3d(){
   parallaxWrap.appendChild(wrap);
   shapeField.appendChild(parallaxWrap);
 }
-for(let i=0;i<9;i++){ spawnShape3d(); }
+if(!isSmallScreen){
+  for(let i=0;i<9;i++){ spawnShape3d(); }
+}
 
 // ---------- Cursor sparkle trail ----------
 const trailGlyphs = ['✦', '✧', '·'];
@@ -1409,7 +1425,7 @@ form.addEventListener('submit', (e) => {
       setTimeout(() => {
         const videoSection = document.getElementById('videoSection');
         const video = document.getElementById('birthdayVideo');
-        if(videoSection) videoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if(videoSection) videoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if(video){
           video.muted = true; // needed for autoplay to reliably work across browsers
           const playPromise = video.play();
