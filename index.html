@@ -120,6 +120,79 @@
     text-align:center;
     padding: 2rem 1.5rem;
     position:relative;
+    overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute; inset:0;
+    background-size:cover;
+    background-position:center;
+    background-color:#ffd6e3;
+    background-image: linear-gradient(135deg, #ffb3c6, #ff8fab);
+    transform: scale(1.08);
+    animation: heroBgZoom 18s ease-in-out infinite alternate;
+  }
+  @keyframes heroBgZoom{
+    from{ transform: scale(1.08); }
+    to{ transform: scale(1); }
+  }
+  .hero-overlay{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(255,243,247,0.35) 0%, rgba(255,111,145,0.55) 55%, rgba(255,243,247,0.95) 100%);
+  }
+  .hero-content{
+    position:relative; z-index:2;
+    max-width:640px;
+  }
+  .hero-eyebrow{
+    font-size:0.72rem;
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    color:#fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    margin-bottom:1rem;
+    opacity:0;
+    animation: heroFadeUp 0.9s ease forwards 0.2s;
+  }
+  .hero-title{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(2.2rem, 7vw, 3.4rem);
+    line-height:1.15;
+    color:#fff;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    margin:0 0 1rem;
+    opacity:0;
+    animation: heroFadeUp 1s ease forwards 0.5s;
+  }
+  .hero-title span{ color:#fff8fa; text-decoration: underline wavy rgba(255,255,255,0.5) 2px; text-underline-offset: 6px; }
+  .hero-tagline{
+    color:#fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    font-size:1rem;
+    margin:0 0 1.8rem;
+    opacity:0;
+    animation: heroFadeUp 1s ease forwards 0.9s;
+  }
+  .hero-cta{
+    background:#fff;
+    color:var(--rose);
+    border:none;
+    border-radius:999px;
+    padding:0.9rem 1.8rem;
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:0.9rem;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    opacity:0;
+    animation: heroFadeUp 1s ease forwards 1.3s;
+    transition: transform 0.2s ease;
+  }
+  .hero-cta:hover{ transform: translateY(-3px) scale(1.03); }
+  @keyframes heroFadeUp{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
   }
 
   .term-window{
@@ -843,14 +916,15 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero">
-  <div class="term-window">
-    <div class="term-bar">
-      <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
-      <span class="term-title">surprise.exe</span>
-    </div>
-    <div class="term-body" id="termBody"></div>
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="heroEyebrow">based on our love story</div>
+    <h1 class="hero-title" id="heroTitle">A Special Story<br>for <span id="heroName">Pappu</span> ♥</h1>
+    <p class="hero-tagline" id="heroTagline">Every moment with you is my favorite story.</p>
+    <button class="hero-cta" id="heroCta">Start Our Story ▶</button>
   </div>
-  <div class="scroll-hint">↓ scroll to run the rest of the program ↓</div>
+  <div class="scroll-hint">↓ scroll to continue ↓</div>
 </section>
 
 <!-- ================= COUNTDOWN ================= -->
@@ -959,6 +1033,7 @@
    ============================================================ */
 const CONFIG = {
   HER_NAME: "pappu",              // lowercase, what she must type (case-insensitive match) to open the gift box
+  HERO_PHOTO: "photos/fav.jpeg",  // background photo for the opening title screen — leave as-is to use a pink gradient instead
   SITE_PASSWORD: "pappu",         // she has to type this before the page unlocks, lowercase match
   TARGET_DATE: "2026-08-15T00:00:00", // countdown target — her local midnight on her birthday
   GIFT_CLUE: "", // left empty on purpose — leave blank if you're handing the real gift to her in person instead of hiding it
@@ -994,8 +1069,6 @@ gateForm.addEventListener('submit', (e) => {
     gateError.textContent = '';
     passwordGate.classList.add('unlocked');
     document.body.classList.remove('gate-active');
-    // give the boot sequence a beat after the curtains clear
-    setTimeout(() => { if(typeof runBoot === 'function' && !bootStarted){ bootStarted = true; runBoot(bootLines, termBody); } }, 500);
   } else {
     gateError.textContent = "hmm, that's not it — try again";
     gatePasswordInput.value = '';
@@ -1113,58 +1186,22 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 revealEls.forEach(el => revealObserver.observe(el));
 
-// ---------- Terminal boot sequence ----------
-const termBody = document.getElementById('termBody');
-const bootLines = [
-  { text: `$ whoami`, cls: 'term-prompt', pause: 300 },
-  { text: `> your favorite developer`, cls: 'term-out', pause: 500 },
-  { text: `$ ./compile_surprise.sh --for="${CONFIG.HER_NAME}"`, cls: 'term-prompt', pause: 400 },
-  { text: `> loading memories...        [OK]`, cls: 'term-ok', pause: 350 },
-  { text: `> loading inside jokes...    [OK]`, cls: 'term-ok', pause: 350 },
-  { text: `> loading how much I love you...`, cls: 'term-out', pause: 400 },
-  { text: `> ERROR: value too large to compute`, cls: 'term-heart', pause: 500 },
-  { text: `> ...compiling anyway`, cls: 'term-out', pause: 600 },
-  { text: `$ echo "happy birthday"`, cls: 'term-prompt', pause: 300 },
-  { text: `> happy birthday, ${CONFIG.HER_NAME}. 💛`, cls: 'term-heart', pause: 0 },
-];
-
-function typeLine(line, container, cb){
-  const div = document.createElement('div');
-  div.className = 'term-line ' + line.cls;
-  container.appendChild(div);
-  let i = 0;
-  const speed = 18;
-  function step(){
-    if(i <= line.text.length){
-      div.textContent = line.text.slice(0, i);
-      i++;
-      setTimeout(step, speed);
-    } else {
-      setTimeout(cb, line.pause);
-    }
+// ---------- Hero (photo + title reveal) ----------
+(function setupHero(){
+  const heroBg = document.getElementById('heroBg');
+  const heroName = document.getElementById('heroName');
+  const heroCta = document.getElementById('heroCta');
+  const displayName = CONFIG.HER_NAME.charAt(0).toUpperCase() + CONFIG.HER_NAME.slice(1);
+  heroName.textContent = displayName;
+  if(CONFIG.HERO_PHOTO){
+    const img = new Image();
+    img.onload = () => { heroBg.style.backgroundImage = `url("${CONFIG.HERO_PHOTO}")`; };
+    img.src = CONFIG.HERO_PHOTO; // falls back to the CSS gradient if this never loads
   }
-  step();
-}
-
-function runBoot(lines, container, onDone){
-  let idx = 0;
-  function next(){
-    if(idx >= lines.length){
-      const cur = document.createElement('span');
-      cur.className = 'cursor';
-      container.appendChild(cur);
-      if(onDone) onDone();
-      return;
-    }
-    typeLine(lines[idx], container, () => { idx++; next(); });
-  }
-  next();
-}
-let bootStarted = false;
-if(!document.body.classList.contains('gate-active')){
-  bootStarted = true;
-  runBoot(bootLines, termBody);
-}
+  heroCta.addEventListener('click', () => {
+    document.getElementById('countdown').scrollIntoView({ behavior: 'smooth' });
+  });
+})();
 
 // ---------- Countdown (3D flip-clock) ----------
 const target = new Date(CONFIG.TARGET_DATE).getTime();
