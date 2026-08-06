@@ -66,10 +66,11 @@
     color:var(--ink);
     font-family:var(--mono);
     overflow-x:hidden;
-    perspective: 1200px;
   }
 
   ::selection{ background:var(--rose); color:#fff; }
+
+  #mainContent{ perspective: 1200px; }
 
   a{ color:var(--mint); }
 
@@ -823,12 +824,13 @@
   }
   #birthdayVideo{
     width:100%;
+    max-width:380px;
     aspect-ratio: 9/16;
-    max-height:70vh;
     object-fit:cover;
     border-radius:10px;
     background:#000;
     display:block;
+    margin:0 auto;
   }
   .video-fallback{
     margin:0.9rem 0 0;
@@ -1019,7 +1021,7 @@
   @media (max-width:640px){
     #colorWash{ display:none; }
     #shapeField{ display:none; }
-    body{ perspective:none; }
+    #mainContent{ perspective:none; }
     .reveal-on-scroll{ transform: translateY(24px); } /* drop the rotateX for a cheaper, smoother reveal */
     .reveal-on-scroll.in-view{ transform: translateY(0); }
   }
@@ -1384,7 +1386,7 @@ initGarden();
   const span = Math.max(maxX - minX, maxY - minY);
   const points = raw.map(p => ({
     x: 10 + ((p.x - minX) / span) * 80,
-    y: 10 + ((p.y - minY) / span) * 80
+    y: 10 + (1 - (p.y - minY) / span) * 80 // flipped: the formula's cusp is a max-y value, but screen y grows downward, so invert
   }));
 
   let foundCount = 0;
