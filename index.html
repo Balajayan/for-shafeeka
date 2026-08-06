@@ -112,6 +112,7 @@
 
   /* ================= HERO / TERMINAL BOOT ================= */
   .hero{
+    min-height:100vh;
     min-height:100svh;
     display:flex;
     flex-direction:column;
@@ -428,7 +429,7 @@
     padding:0.75rem 1rem;
     color:var(--ink);
     font-family:var(--mono);
-    font-size:0.9rem;
+    font-size:1rem;
     outline:none;
   }
   .unlock-form input:focus{ border-color:var(--mint); }
@@ -869,6 +870,149 @@
     animation: blink 1s steps(1) infinite;
   }
 
+  /* ================= STAR MAP ================= */
+  .starmap-card{
+    position:relative;
+    background: radial-gradient(ellipse at 50% 0%, #241a45, #0d0a1f 70%);
+    border-radius:20px;
+    padding: 1.6rem 1rem 1.8rem;
+    overflow:hidden;
+    box-shadow: 0 25px 60px rgba(20,10,50,0.35);
+  }
+  .starmap-sub{
+    color:#c9b8ff;
+    font-size:0.82rem;
+    text-align:center;
+    margin:0 0 1rem;
+  }
+  .starmap-stage{
+    position:relative;
+    width:100%;
+    aspect-ratio: 4/3;
+    max-width:480px;
+    margin:0 auto;
+  }
+  .starmap-bgstar{
+    position:absolute;
+    width:2px; height:2px;
+    background:#fff;
+    border-radius:50%;
+    opacity:0.5;
+  }
+  .starmap-svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .starmap-heart-path{
+    fill:none;
+    stroke:#ff7fa5;
+    stroke-width:2;
+    stroke-linecap:round;
+    filter: drop-shadow(0 0 6px rgba(255,127,165,0.8));
+  }
+  .star-point{
+    position:absolute;
+    width:26px; height:26px;
+    transform: translate(-50%,-50%);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .star-point .glyph{
+    font-size:20px;
+    color:#8a7fc9;
+    transition: color 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+  }
+  .star-point.found .glyph{
+    color:#ffd166;
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 8px rgba(255,209,102,0.9));
+    animation: starTwinkle 1.8s ease-in-out infinite;
+  }
+  @keyframes starTwinkle{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.6; }
+  }
+  .starmap-reveal{
+    margin-top:1.2rem;
+    min-height:2.6em;
+    text-align:center;
+    color:#fff0f6;
+    font-family:var(--serif);
+    font-size:0.95rem;
+    line-height:1.5;
+    padding:0 0.5rem;
+  }
+  .starmap-progress{
+    text-align:center;
+    margin-top:0.6rem;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    color:#a99adf;
+  }
+
+  /* ================= BLOOMING GARDEN ================= */
+  .garden-card{
+    background: linear-gradient(180deg, #fff5f8 0%, #ffe0ea 60%, #ffc9dc 100%);
+    border:1px solid rgba(255,111,145,0.25);
+    border-radius:20px;
+    padding: 1.6rem 1.2rem 1.2rem;
+    box-shadow: 0 20px 50px rgba(255,111,145,0.18);
+  }
+  .garden-sub{
+    color:var(--ink-dim);
+    font-size:0.85rem;
+    text-align:center;
+    margin:0 0 1.2rem;
+  }
+  .garden-bed{
+    display:flex;
+    justify-content:space-evenly;
+    align-items:flex-end;
+    gap:0.4rem;
+    min-height:120px;
+    border-bottom: 4px solid #8bc78f;
+    padding-bottom:0.4rem;
+  }
+  .flower-slot{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex:1;
+    max-width:90px;
+  }
+  .flower-stem{
+    font-size:1.8rem;
+    line-height:1;
+    filter: grayscale(1) opacity(0.35);
+    transform: scale(0.6) translateY(10px);
+    transition: transform 0.6s cubic-bezier(.2,.9,.3,1.3), filter 0.6s ease;
+  }
+  .flower-slot.bloomed .flower-stem{
+    filter: grayscale(0) opacity(1);
+    transform: scale(1) translateY(0);
+    animation: flowerBob 3s ease-in-out infinite;
+  }
+  @keyframes flowerBob{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-4px) rotate(-3deg); }
+  }
+  .flower-label{
+    margin-top:0.4rem;
+    font-size:0.62rem;
+    text-align:center;
+    color:var(--ink-dim);
+    letter-spacing:0.02em;
+  }
+  .flower-slot.bloomed .flower-label{ color:var(--rose); font-weight:600; }
+  .garden-status{
+    text-align:center;
+    margin-top:1rem;
+    font-size:0.82rem;
+    color:var(--ink-dim);
+  }
+  .garden-status.complete{
+    color:#c2185b;
+    font-weight:700;
+  }
+
   body.gate-active{ overflow:hidden; height:100vh; }
 
   /* lighten the heaviest visual effects on phones to prevent lag */
@@ -1006,6 +1150,33 @@
   </div>
 </section>
 
+<!-- ================= REASONS ================= -->
+<section id="starmap" class="reveal-on-scroll">
+  <div class="eyebrow">// map the sky</div>
+  <h2 class="title">Every star, a memory</h2>
+  <div class="starmap-card">
+    <p class="starmap-sub">Tap each star to find a memory. Find them all and watch what they become.</p>
+    <div class="starmap-stage" id="starmapStage">
+      <svg class="starmap-svg" id="starmapSvg" viewBox="0 0 100 75" preserveAspectRatio="none">
+        <path class="starmap-heart-path" id="starmapHeartPath" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1;"></path>
+      </svg>
+    </div>
+    <p class="starmap-reveal" id="starmapReveal"></p>
+    <p class="starmap-progress" id="starmapProgress"></p>
+  </div>
+</section>
+
+<!-- ================= BLOOMING GARDEN ================= -->
+<section id="garden" class="reveal-on-scroll">
+  <div class="eyebrow">// growth.log</div>
+  <h2 class="title">Our garden, growing</h2>
+  <div class="garden-card">
+    <p class="garden-sub">Every part of this page you explore makes something bloom here.</p>
+    <div class="garden-bed" id="gardenBed"></div>
+    <p class="garden-status" id="gardenStatus"></p>
+  </div>
+</section>
+
 <!-- ================= QR ================= -->
 <section id="qr" class="reveal-on-scroll">
   <div class="eyebrow">// scan to decrypt</div>
@@ -1043,6 +1214,17 @@ const CONFIG = {
   SPOTIFY_TRACK_ID: "6DFdJRSeqjWjXiIMxPhxkh", // used to power the real music player at the bottom of the page
   VIDEO_SRC: "video.mp4", // put a video file named video.mp4 next to index.html (same folder as photos/)
   LETTER_TEXT: "Happy Birthday to the most beautiful soul in my life, Shafeeka. You mean the world to me. Thank you for being my happiness, my peace, and my everything. I promise to stay with you, support you, and love you — today, tomorrow, and forever.",
+  STAR_MEMORIES: [
+    "The first time we talked, I didn't want it to end.",
+    "The first time you laughed at one of my terrible jokes.",
+    "The day I realized I was falling for you.",
+    "Our first outing together — I still remember what you wore.",
+    "The first time you fell asleep while we were talking on call.",
+    "The first time you said you loved me.",
+    "Every small moment since, that somehow adds up to everything.",
+    "And this one — right now, you finding all these stars for me."
+    // add or remove lines — each one becomes a star she can tap to find. Keep 6-10 for the heart shape to look right.
+  ],
   PHOTOS: [
     { caption: "our first outing", src: "photos/outing.jpeg" },
     { caption: "our first story", src: "photos/story.jpeg" },
@@ -1083,6 +1265,7 @@ gateForm.addEventListener('submit', (e) => {
   const source = video.querySelector('source');
   source.src = CONFIG.VIDEO_SRC;
   video.addEventListener('error', () => { fallback.style.display = 'block'; }, true);
+  video.addEventListener('playing', () => bloomFlower('video'), { once: true });
   video.load();
 })();
 
@@ -1105,6 +1288,7 @@ gateForm.addEventListener('submit', (e) => {
             setTimeout(step, 22);
           } else if(letterCursor){
             letterCursor.style.display = 'none';
+            bloomFlower('letter');
           }
         }
         step();
@@ -1113,6 +1297,127 @@ gateForm.addEventListener('submit', (e) => {
     });
   }, { threshold: 0.4 });
   obs.observe(letterSection);
+})();
+
+// ---------- Blooming garden (shared across sections) ----------
+const FLOWER_DEFS = [
+  { key: 'gift',   emoji: '🌷', label: 'the gift' },
+  { key: 'letter', emoji: '🌹', label: 'the letter' },
+  { key: 'gallery',emoji: '🌼', label: 'our memories' },
+  { key: 'stars',  emoji: '🌸', label: 'the stars' },
+  { key: 'video',  emoji: '🌻', label: 'the video' },
+];
+const bloomedKeys = new Set();
+function initGarden(){
+  const bed = document.getElementById('gardenBed');
+  if(!bed) return;
+  FLOWER_DEFS.forEach(def => {
+    const slot = document.createElement('div');
+    slot.className = 'flower-slot';
+    slot.dataset.key = def.key;
+    slot.innerHTML = `<div class="flower-stem">${def.emoji}</div><div class="flower-label">${def.label}</div>`;
+    bed.appendChild(slot);
+  });
+  updateGardenStatus();
+}
+function bloomFlower(key){
+  if(bloomedKeys.has(key)) return;
+  bloomedKeys.add(key);
+  const slot = document.querySelector(`.flower-slot[data-key="${key}"]`);
+  if(slot) slot.classList.add('bloomed');
+  updateGardenStatus();
+}
+function updateGardenStatus(){
+  const statusEl = document.getElementById('gardenStatus');
+  if(!statusEl) return;
+  const total = FLOWER_DEFS.length;
+  const done = bloomedKeys.size;
+  if(done === 0){
+    statusEl.textContent = 'nothing blooming yet — go explore the page';
+    statusEl.classList.remove('complete');
+  } else if(done === total){
+    statusEl.textContent = "our little garden is in full bloom 🌸";
+    statusEl.classList.add('complete');
+    if(window.confetti){
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 }, colors: ['#ff6f91','#c9a7ff','#ffd166','#ffb3c6'] });
+    }
+  } else {
+    statusEl.textContent = `${done} of ${total} things blooming so far`;
+    statusEl.classList.remove('complete');
+  }
+}
+initGarden();
+
+// ---------- Star map ----------
+(function setupStarmap(){
+  const stage = document.getElementById('starmapStage');
+  const svg = document.getElementById('starmapSvg');
+  const heartPath = document.getElementById('starmapHeartPath');
+  const reveal = document.getElementById('starmapReveal');
+  const progress = document.getElementById('starmapProgress');
+  const memories = CONFIG.STAR_MEMORIES && CONFIG.STAR_MEMORIES.length ? CONFIG.STAR_MEMORIES : ['A memory, just for you.'];
+  const N = memories.length;
+
+  // scatter faint background stars for atmosphere
+  for(let i = 0; i < 26; i++){
+    const bg = document.createElement('div');
+    bg.className = 'starmap-bgstar';
+    bg.style.left = Math.random()*100 + '%';
+    bg.style.top = Math.random()*100 + '%';
+    bg.style.opacity = 0.2 + Math.random()*0.5;
+    stage.appendChild(bg);
+  }
+
+  // sample points around a parametric heart curve
+  function heartAt(t){
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+    return { x, y };
+  }
+  const raw = [];
+  for(let i = 0; i < N; i++){
+    raw.push(heartAt((i / N) * Math.PI * 2));
+  }
+  const xs = raw.map(p => p.x), ys = raw.map(p => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const span = Math.max(maxX - minX, maxY - minY);
+  const points = raw.map(p => ({
+    x: 10 + ((p.x - minX) / span) * 80,
+    y: 10 + ((p.y - minY) / span) * 80
+  }));
+
+  let foundCount = 0;
+  points.forEach((pt, i) => {
+    const star = document.createElement('div');
+    star.className = 'star-point';
+    star.style.left = pt.x + '%';
+    star.style.top = pt.y + '%';
+    star.innerHTML = '<span class="glyph">✦</span>';
+    star.addEventListener('click', () => {
+      if(star.classList.contains('found')) return;
+      star.classList.add('found');
+      foundCount++;
+      reveal.textContent = memories[i];
+      progress.textContent = `${foundCount} of ${N} stars found`;
+      if(foundCount === N){
+        drawHeart();
+        bloomFlower('stars');
+        reveal.textContent = "you found them all — every one of them is us.";
+      }
+    });
+    stage.appendChild(star);
+  });
+  progress.textContent = `0 of ${N} stars found`;
+
+  function drawHeart(){
+    const d = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y * 0.75}`).join(' ') + ' Z';
+    heartPath.setAttribute('d', d);
+    requestAnimationFrame(() => {
+      heartPath.style.transition = 'stroke-dashoffset 2.2s ease';
+      heartPath.style.strokeDashoffset = '0';
+    });
+  }
 })();
 
 
@@ -1350,6 +1655,7 @@ if(termWindow && heroSection){
 
 // ---------- Gallery ----------
 const galleryGrid = document.getElementById('galleryGrid');
+const flippedPhotos = new Set();
 const gradients = [
   'linear-gradient(135deg,#ff9a9e,#fecfef)',
   'linear-gradient(135deg,#a1c4fd,#c2e9fb)',
@@ -1398,6 +1704,10 @@ CONFIG.PHOTOS.forEach((p, i) => {
 
   outer.addEventListener('click', () => {
     outer.classList.toggle('flipped');
+    if(outer.classList.contains('flipped')){
+      flippedPhotos.add(i);
+      if(flippedPhotos.size === CONFIG.PHOTOS.length) bloomFlower('gallery');
+    }
   });
 });
 
@@ -1446,6 +1756,7 @@ form.addEventListener('submit', (e) => {
   if(val === CONFIG.HER_NAME.toLowerCase()){
     unlocked = true;
     errEl.textContent = '';
+    bloomFlower('gift');
     box.classList.remove('idle');
     box.classList.add('opening');
     setTimeout(() => box.classList.add('open'), 300);
